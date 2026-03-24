@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IO — It's Olivia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #1B1B1B;
+    --white: #FFFFFF;
+    --gold: #C0B387;
+    --gold-light: #D9CBA8;
+    --blush: #F4D7D3;
+    --blush-deep: #E8C0BA;
+    --charcoal: #2A2A2A;
+    --off-white: #FAF8F5;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--black);
+    color: var(--white);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(192,179,135,0.5);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: all 0.18s ease;
+  }
+  .cursor-ring.hover { transform: translate(-50%, -50%) scale(2.2); border-color: var(--gold); }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 28px 60px;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: background 0.4s, padding 0.4s;
+  }
+  nav.scrolled { background: rgba(27,27,27,0.92); backdrop-filter: blur(18px); padding: 18px 60px; }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px; font-weight: 300; letter-spacing: 8px;
+    color: var(--white); text-decoration: none;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links a {
+    font-size: 14px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(255,255,255,0.7); text-decoration: none;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-cta {
+    font-size: 10px; font-weight: 400; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--black); background: var(--gold);
+    padding: 12px 28px; text-decoration: none;
+    transition: background 0.3s;
+  }
+  .nav-cta:hover { background: var(--gold-light); }
+
+  /* HERO */
+  #hero {
+    height: 100vh; min-height: 700px;
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--black);
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url(Homepage-Banner.jpg);
+  }
+  .hero-grain {
+    position: absolute; inset: 0; opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 256px;
+  }
+  .hero-line-left {
+    position: absolute; left: 60px; top: 50%; transform: translateY(-50%);
+    width: 1px; height: 180px; background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    opacity: 0.4;
+  }
+  .hero-line-right {
+    position: absolute; right: 60px; top: 50%; transform: translateY(-50%);
+    width: 1px; height: 180px; background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    opacity: 0.4;
+  }
+  .hero-content {
+    position: relative; z-index: 2;
+    text-align: center; padding: 0 40px;
+    max-width: 900px;
+    animation: fadeUp 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .hero-eyebrow {
+    font-size: 12px; letter-spacing: 6px; text-transform: uppercase; font-weight: 300;
+    color: var(--gold); margin-bottom: 36px;
+    opacity: 0; animation: fadeUp 1s 0.3s ease both;
+  }
+  .hero-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(48px, 8vw, 110px); font-weight: 300; line-height: 1.0;
+    color: var(--white); letter-spacing: -1px;
+    opacity: 0; animation: fadeUp 1s 0.6s ease both;
+  }
+  .hero-headline em { font-style: italic; color: var(--gold); }
+  .hero-subheadline {
+    font-size: clamp(13px, 1.5vw, 16px); font-weight: 200; letter-spacing: 3px;
+    color: rgba(255,255,255,0.55); margin-top: 32px; line-height: 1.9;
+    opacity: 0; animation: fadeUp 1s 0.9s ease both;
+  }
+  .hero-cta {
+    display: inline-block; margin-top: 52px;
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase; font-weight: 400;
+    color: var(--black); background: var(--gold);
+    padding: 16px 48px; text-decoration: none;
+    position: relative; overflow: hidden;
+    opacity: 0; animation: fadeUp 1s 1.2s ease both;
+    transition: background 0.3s;
+  }
+  .hero-cta:hover { background: var(--gold-light); }
+  .hero-cta::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 2px; background: var(--black); transform: scaleX(0);
+    transition: transform 0.3s;
+  }
+  .hero-cta:hover::after { transform: scaleX(1); }
+  .hero-scroll {
+    position: absolute; bottom: 48px; left: calc(50% - 31px); transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    opacity: 0; animation: fadeUp 1s 1.8s ease both;
+  }
+  .hero-scroll span { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+  .scroll-line { width: 1px; height: 60px; background: linear-gradient(to bottom, rgba(192,179,135,0.6), transparent); animation: scrollPulse 2s ease-in-out infinite; }
+
+  /* SECTION COMMON */
+  section { position: relative; }
+  .section-tag {
+    font-size: 12px; letter-spacing: 5px; text-transform: uppercase; font-weight: 300;
+    color: var(--gold); display: block; margin-bottom: 20px;
+  }
+
+  /* BELIEF SECTION */
+  #belief {
+    background: var(--off-white);
+    padding: 160px 60px;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 80px; align-items: center;
+  }
+  .belief-left { position: relative; }
+  .belief-accent {
+    position: absolute; left: -30px; top: -20px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 240px; font-weight: 300; color: rgba(192,179,135,0.08);
+    line-height: 1; pointer-events: none; z-index: 0; letter-spacing: -10px;
+  }
+  .belief-left-content { position: relative; z-index: 1; }
+  .belief-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 4.5vw, 62px); font-weight: 300; line-height: 1.15;
+    color: var(--black); letter-spacing: -0.5px;
+  }
+  .belief-headline em { font-style: italic; color: var(--gold); }
+  .belief-text {
+    margin-top: 32px; font-size: 16px; font-weight: 200; line-height: 2.0;
+    color: rgba(27,27,27,0.65);
+  }
+  .belief-divider {
+    width: 60px; height: 1px; background: var(--gold);
+    margin: 36px 0;
+  }
+  .belief-right { }
+  .belief-card {
+    background: var(--black); padding: 52px 48px;
+    position: relative; overflow: hidden;
+  }
+  .belief-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 2px; background: linear-gradient(to right, var(--gold), transparent);
+  }
+  .belief-card-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(22px, 2.5vw, 32px); font-weight: 300; font-style: italic;
+    color: var(--white); line-height: 1.55;
+  }
+  .belief-card-quote span { color: var(--gold); }
+  .belief-card-author {
+    margin-top: 36px; font-size: 12px; letter-spacing: 4px;
+    text-transform: uppercase; color: rgba(255,255,255,0.35);
+  }
+
+  /* PRODUCTS SECTION */
+  #products {
+    background: var(--black); padding: 160px 60px;
+  }
+  .products-header { text-align: center; margin-bottom: 100px; }
+  .products-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(38px, 5vw, 72px); font-weight: 300; line-height: 1.1;
+    color: var(--white);
+  }
+  .products-headline em { font-style: italic; color: var(--gold); }
+  .products-sub {
+    margin-top: 20px; font-size: 16px; font-weight: 200; letter-spacing: 2px;
+    color: rgba(255,255,255,0.4);
+  }
+  .products-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+  }
+  .product-card {
+    position: relative; overflow: hidden;
+    background: #232220;
+    padding: 64px 48px 56px;
+    cursor: none;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .product-card:hover { transform: translateY(-6px); }
+  .product-card::before {
+    content: ''; position: absolute; top: 0; left: 0; bottom: 0;
+    width: 2px; background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    opacity: 0; transition: opacity 0.4s;
+  }
+  .product-card:hover::before { opacity: 1; }
+  .product-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 80px; font-weight: 300;
+    color: rgba(192,179,135,0.08); line-height: 1;
+    position: absolute; top: 20px; right: 32px;
+  }
+  .product-icon {
+    width: 52px; height: 52px; margin-bottom: 36px;
+    border: 1px solid rgba(192,179,135,0.3);
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+  }
+  .product-icon svg { width: 22px; height: 22px; fill: none; stroke: var(--gold); stroke-width: 1.2; }
+  .product-name {
+    font-size: 12px; letter-spacing: 4px; text-transform: uppercase; font-weight: 300;
+    color: var(--gold); margin-bottom: 16px;
+  }
+  .product-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(24px, 2.5vw, 34px); font-weight: 300; line-height: 1.2;
+    color: var(--white);
+  }
+  .product-tagline {
+    margin-top: 8px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px; font-style: italic; font-weight: 300;
+    color: rgba(192,179,135,0.6);
+  }
+  .product-desc {
+    margin-top: 24px; font-size: 16px; font-weight: 200; line-height: 1.95;
+    color: rgba(255,255,255,0.5);
+  }
+  .product-divider { width: 40px; height: 1px; background: var(--gold); margin: 28px 0; opacity: 0.5; }
+  .product-transformation {
+    font-size: 16px; font-weight: 300; line-height: 1.8;
+    color: rgba(255,255,255,0.75);
+  }
+  .product-link {
+    display: inline-flex; align-items: center; gap: 12px;
+    margin-top: 36px; font-size: 12px; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--gold); text-decoration: none;
+    transition: gap 0.3s;
+  }
+  .product-link:hover { gap: 18px; }
+  .product-link svg { width: 16px; height: 16px; stroke: var(--gold); stroke-width: 1.5; fill: none; transition: transform 0.3s; }
+  .product-link:hover svg { transform: translateX(4px); }
+
+  /* SIGNATURE HIGHLIGHT SECTION */
+  #signature {
+    background: var(--off-white); padding: 0;
+    overflow: hidden;
+  }
+  .sig-block {
+    display: grid; grid-template-columns: 1fr 1fr;
+    min-height: 600px;
+  }
+  .sig-block:nth-child(even) .sig-visual { order: 2; }
+  .sig-block:nth-child(even) .sig-copy { order: 1; }
+  .sig-visual {
+    position: relative; overflow: hidden; min-height: 500px;
+  }
+  .sig-visual-bg {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sig-visual-bg.perfume {
+    background-image: linear-gradient(rgba(27, 27, 27, .7), rgba(42, 37, 32, .7)), url(Parfume.jpg);
+    background-size: cover;
+  }
+  .sig-visual-bg.collagen {
+    background-image: linear-gradient(rgba(244, 232, 226, .7), rgba(237, 213, 206, .7)), url(Collagen.jpg);
+    background-size: cover;
+  }
+  .sig-visual-bg.coffee {
+    background-image: linear-gradient(rgba(26, 20, 15, .7), rgba(44, 31, 21, .7)), url(Coffee.jpg);
+    background-size: cover;
+  }
+  .sig-visual-icon {
+    width: 120px; height: 120px; position: relative;
+  }
+  .sig-visual-icon::before {
+    content: ''; position: absolute; inset: 0;
+    border-radius: 50%; background: rgba(192,179,135,0.08);
+  }
+  .sig-visual-inner {
+    position: absolute; inset: 12px;
+    border: 1px solid rgba(192,179,135,0.25);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sig-visual-inner svg { width: 44px; height: 44px; stroke-width: 0.8; }
+  .sig-letter {
+    position: absolute; font-family: 'Cormorant Garamond', serif;
+    font-size: 320px; font-weight: 300; opacity: 0.04; line-height: 1;
+    color: var(--white); bottom: -40px; right: -20px;
+    pointer-events: none;
+  }
+  .sig-letter.dark { color: var(--black); }
+  .sig-copy {
+    padding: 100px 80px; display: flex; flex-direction: column; justify-content: center;
+  }
+  .sig-copy.on-dark { background: var(--black); }
+  .sig-copy.on-light { background: var(--off-white); }
+  .sig-copy.on-coffee { background: #1A140F; }
+  .sig-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(30px, 3.5vw, 52px); font-weight: 300; line-height: 1.15;
+  }
+  .sig-copy.on-dark .sig-headline { color: var(--white); }
+  .sig-copy.on-light .sig-headline { color: var(--black); }
+  .sig-copy.on-coffee .sig-headline { color: var(--white); }
+  .sig-headline em { font-style: italic; color: var(--gold); }
+  .sig-body {
+    margin-top: 28px; font-size: 16px; font-weight: 200; line-height: 2.1;
+  }
+  .sig-copy.on-dark .sig-body { color: rgba(255,255,255,0.5); }
+  .sig-copy.on-light .sig-body { color: rgba(27,27,27,0.6); }
+  .sig-copy.on-coffee .sig-body { color: rgba(255,255,255,0.45); }
+  .sig-attribute {
+    margin-top: 36px; display: flex; flex-direction: column; gap: 14px;
+  }
+  .sig-attr-row {
+    display: flex; align-items: center; gap: 16px;
+    font-size: 14px; font-weight: 200; letter-spacing: 2px;
+  }
+  .sig-copy.on-dark .sig-attr-row { color: rgba(255,255,255,0.45); }
+  .sig-copy.on-light .sig-attr-row { color: rgba(27,27,27,0.5); }
+  .sig-copy.on-coffee .sig-attr-row { color: rgba(255,255,255,0.4); }
+  .sig-attr-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+  .sig-btn {
+    display: inline-block; margin-top: 48px;
+    font-size: 12px; letter-spacing: 4px; text-transform: uppercase;
+    padding: 14px 40px; text-decoration: none; transition: all 0.3s;
+  }
+  .sig-copy.on-dark .sig-btn { color: var(--gold); border: 1px solid rgba(192,179,135,0.3); }
+  .sig-copy.on-light .sig-btn { color: var(--black); border: 1px solid rgba(27,27,27,0.3); }
+  .sig-copy.on-coffee .sig-btn { color: var(--gold); border: 1px solid rgba(192,179,135,0.3); }
+  .sig-btn:hover { background: var(--gold); color: var(--black); border-color: var(--gold); }
+
+  /* SOCIAL PROOF */
+  #proof {
+    background: var(--black); padding: 140px 60px;
+  }
+  .proof-header { text-align: center; margin-bottom: 80px; }
+  .proof-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(30px, 3.5vw, 52px); font-weight: 300;
+    color: var(--white);
+  }
+  .proof-headline em { font-style: italic; color: var(--gold); }
+  .proof-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .proof-card {
+    background: #1E1D1A; padding: 52px 44px;
+    position: relative;
+  }
+  .proof-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 1px; background: linear-gradient(to right, transparent, rgba(192,179,135,0.3), transparent);
+  }
+  .proof-stars { display: flex; gap: 4px; margin-bottom: 28px; }
+  .star { width: 12px; height: 12px; fill: var(--gold); }
+  .proof-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(17px, 1.8vw, 22px); font-weight: 300; font-style: italic;
+    color: var(--white); line-height: 1.65;
+  }
+  .proof-quote span { color: var(--gold); }
+  .proof-author {
+    margin-top: 32px; display: flex; align-items: center; gap: 16px;
+  }
+  .proof-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 1px solid rgba(192,179,135,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px; font-weight: 300; color: var(--gold);
+    background: rgba(192,179,135,0.06);
+  }
+  .proof-name { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+  .proof-title { font-size: 12px; color: rgba(255,255,255,0.25); margin-top: 3px; }
+
+  /* LIFESTYLE SECTION */
+  #lifestyle {
+    background: var(--off-white);
+    padding: 160px 60px;
+    position: relative; overflow: hidden;
+  }
+  .lifestyle-bg-text {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28vw; font-weight: 300; color: rgba(192,179,135,0.045);
+    white-space: nowrap; pointer-events: none; letter-spacing: -10px;
+  }
+  .lifestyle-content { position: relative; z-index: 1; max-width: 800px; }
+  .lifestyle-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(38px, 5.5vw, 78px); font-weight: 300; line-height: 1.05;
+    color: var(--black);
+  }
+  .lifestyle-headline em { font-style: italic; color: var(--gold); }
+  .lifestyle-body {
+    margin-top: 36px; font-size: 16px; font-weight: 200; line-height: 2.1;
+    color: rgba(27,27,27,0.6); max-width: 560px;
+  }
+  .lifestyle-pillars {
+    margin-top: 60px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px;
+  }
+  .pillar {}
+  .pillar-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px; font-weight: 300; color: rgba(192,179,135,0.35); line-height: 1;
+  }
+  .pillar-title {
+    margin-top: 12px; font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    font-weight: 400; color: var(--black);
+  }
+  .pillar-text {
+    margin-top: 12px; font-size: 13px; font-weight: 200; line-height: 1.9;
+    color: rgba(27,27,27,0.55);
+  }
+  .lifestyle-note {
+    margin-top: 64px; padding: 40px 48px;
+    background: var(--black); position: relative; overflow: hidden;
+  }
+  .lifestyle-note::before {
+    content: ''; position: absolute; top: 0; left: 0; bottom: 0;
+    width: 3px; background: var(--gold);
+  }
+  .lifestyle-note-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(18px, 2vw, 26px); font-weight: 300; font-style: italic;
+    color: var(--white); line-height: 1.55;
+  }
+  .lifestyle-note-text span { color: var(--gold); }
+  section#lifestyle {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    justify-content: space-between;
+}
+img.lifestyle-woman {
+    max-width: 610px;
+}
+
+  /* CEO SECTION */
+  #ceo {
+    background: var(--black);
+    padding: 160px 60px;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 100px; align-items: center;
+  }
+  .ceo-left {}
+  .ceo-eyebrow {
+    font-size: 12px; letter-spacing: 5px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 32px;
+  }
+  .ceo-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(30px, 3.5vw, 52px); font-weight: 300; line-height: 1.2;
+    color: var(--white);
+  }
+  .ceo-headline em { font-style: italic; color: var(--gold); }
+  .ceo-manifesto {
+    margin-top: 40px; display: flex; flex-direction: column; gap: 20px;
+  }
+  .ceo-line {
+    font-size: 14px; font-weight: 200; line-height: 1.9;
+    color: rgba(255,255,255,0.55); padding-left: 24px;
+    border-left: 1px solid rgba(192,179,135,0.2);
+  }
+  .ceo-sig {
+    margin-top: 48px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px; font-weight: 300; font-style: italic;
+    color: var(--gold);
+  }
+  .ceo-sig-title { font-size: 12px; letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-top: 8px; }
+  .ceo-right {}
+  .ceo-card {
+    background: #1A1910; border: 1px solid rgba(192,179,135,0.12);
+    padding: 60px 52px; position: relative;
+  }
+  .ceo-card::after {
+    content: ''; position: absolute; bottom: 0; right: 0;
+    width: 60px; height: 60px;
+    border-right: 1px solid rgba(192,179,135,0.2);
+    border-bottom: 1px solid rgba(192,179,135,0.2);
+  }
+  .ceo-philosophy {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(20px, 2.2vw, 30px); font-weight: 300; line-height: 1.6;
+    color: var(--white);
+  }
+  .ceo-philosophy span { display: block; font-style: italic; color: var(--gold); margin-top: 6px; }
+  .ceo-values { margin-top: 48px; display: flex; flex-direction: column; gap: 16px; }
+  .ceo-value {
+    display: flex; align-items: flex-start; gap: 16px;
+  }
+  .ceo-value-icon { width: 20px; height: 20px; flex-shrink: 0; margin-top: 2px; }
+  .ceo-value-icon svg { width: 20px; height: 20px; stroke: var(--gold); fill: none; stroke-width: 1; }
+  .ceo-value-text { font-size: 16px; font-weight: 200; color: rgba(255,255,255,0.5); line-height: 1.7; }
+
+  /* FINAL CTA */
+  #final-cta {
+    position: relative; overflow: hidden;
+    background: var(--off-white);
+    padding: 160px 60px;
+    text-align: center;
+  }
+  .final-cta-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(192,179,135,0.12) 0%, transparent 70%);
+  }
+  .final-cta-content { position: relative; z-index: 1; }
+  .final-cta-line {
+    width: 1px; height: 80px; background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    margin: 0 auto 60px;
+  }
+  .final-cta-tag {
+    font-size: 12px; letter-spacing: 6px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 28px;
+  }
+  .final-cta-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(40px, 6vw, 90px); font-weight: 300; line-height: 1.05;
+    color: var(--black);
+  }
+  .final-cta-headline em { font-style: italic; color: var(--gold); }
+  .final-cta-sub {
+    margin-top: 28px; font-size: 16px; font-weight: 200; letter-spacing: 2px;
+    color: rgba(27,27,27,0.5); line-height: 1.9; max-width: 500px; margin-left: auto; margin-right: auto;
+  }
+  .final-cta-buttons { margin-top: 60px; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    background: var(--black); color: var(--white);
+    padding: 18px 56px; text-decoration: none; transition: all 0.3s;
+  }
+  .btn-primary:hover { background: var(--gold); color: var(--black); }
+  .btn-secondary {
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    background: transparent; color: var(--black);
+    padding: 18px 56px; text-decoration: none;
+    border: 1px solid rgba(27,27,27,0.25); transition: all 0.3s;
+  }
+  .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* FOOTER */
+  footer {
+    background: var(--black); padding: 80px 60px 48px;
+    border-top: 1px solid rgba(192,179,135,0.1);
+  }
+  .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 60px; margin-bottom: 60px; }
+  .footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px; font-weight: 300; letter-spacing: 8px;
+    color: var(--white);
+  }
+  .footer-logo span { color: var(--gold); }
+  .footer-tagline {
+    margin-top: 16px; font-size: 14px; font-weight: 200; line-height: 1.9;
+    color: rgba(255,255,255,0.3); max-width: 240px;
+  }
+  .footer-col-title {
+    font-size: 12px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 24px;
+  }
+  .footer-links { display: flex; flex-direction: column; gap: 12px; }
+  .footer-links a {
+    font-size: 14px; font-weight: 200; color: rgba(255,255,255,0.35);
+    text-decoration: none; transition: color 0.3s;
+  }
+  .footer-links a:hover { color: rgba(255,255,255,0.7); }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.07);
+    padding-top: 32px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-copy { font-size: 14px; font-weight: 200; color: rgba(255,255,255,0.2); }
+  .footer-io {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px; color: rgba(192,179,135,0.4); letter-spacing: 4px;
+  }
+
+  /* SCROLL REVEAL */
+  .reveal {
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.5; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.15); }
+  }
+
+  /* MARQUEE */
+  .marquee-wrap {
+    background: var(--gold); padding: 16px 0; overflow: hidden;
+  }
+  .marquee-track {
+    display: flex; gap: 0; white-space: nowrap;
+    animation: marquee 22s linear infinite;
+  }
+  .marquee-text {
+    font-size: 12px; letter-spacing: 6px; text-transform: uppercase;
+    font-weight: 400; color: var(--black);
+    padding: 0 48px; flex-shrink: 0;
+  }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    nav { padding: 20px 24px; }
+    nav.scrolled { padding: 14px 24px; }
+    .nav-links, .nav-cta { display: none; }
+    #belief, #ceo { grid-template-columns: 1fr; gap: 40px; padding: 80px 24px; }
+    #products { padding: 80px 24px; }
+    .products-grid { grid-template-columns: 1fr; }
+    .sig-block { grid-template-columns: 1fr; }
+    .sig-block:nth-child(even) .sig-visual,
+    .sig-block:nth-child(even) .sig-copy { order: unset; }
+    .sig-visual { min-height: 280px; }
+    .sig-copy { padding: 60px 32px; }
+    .proof-grid { grid-template-columns: 1fr; }
+    #lifestyle, #final-cta { padding: 80px 24px; }
+    .lifestyle-pillars { grid-template-columns: 1fr; gap: 28px; }
+    #ceo { padding: 80px 24px; }
+    .hero-line-left, .hero-line-right { display: none; }
+    .final-cta-buttons { flex-direction: column; align-items: center; }
+    .footer-top { grid-template-columns: 1fr 1fr; gap: 40px; }
+    footer { padding: 60px 24px 36px; }
+    .belief-accent { font-size: 120px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- CUSTOM CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="nav">
+<a href="#" class="nav-logo">
+<svg width="200px" height="auto" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 1369.9 318" style="enable-background:new 0 0 1369.9 318;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#C0B387;}
+</style>
+<g>
+	<g>
+		<g>
+			<path class="st0" d="M201.5,308.8c-63.3-0.5-113.1-52.9-112.4-118.3c0.7-63.2,51.6-113.4,114.3-112.7
+				c63.8,0.7,113.4,51.3,112.9,115.1C315.7,257.4,264.3,309.3,201.5,308.8z M269,239.4c0.3-10.6-1.2-21.4-3.4-32.2
+				c-7-33.9-20.3-64.9-42.2-91.8c-8.6-10.5-18-20.3-30.6-26.2c-20.4-9.6-39.1-3.2-49.6,16.7c-5.7,10.8-8,22.5-8,34.4
+				c-0.2,53.5,19.1,99.6,53.9,139.6c6.5,7.5,14.4,13.5,23.5,17.8c19.8,9.4,39.2,2.6,48.7-17.2C267.5,267.6,269.2,253.9,269,239.4z"
+				/>
+			<path class="st0" d="M91.8,303.9c-23.4,0-46.8,0-70.2,0c-4.4,0-3.3-2.9-3.3-5.2c0-38.1,0-76.2-0.2-114.3c0-14.8,2.2-29.2,7-43.1
+				C33,118.5,46,99.5,66.3,86.1c1.5-1,2.8-2.4,5.6-2.5c0,11.9,0,23.7,0,35.5c-0.1,48.9-0.1,97.8-0.2,146.7c0,10.4,2,19.9,8.9,28.1
+				C83.8,297.6,87.6,300.6,91.8,303.9z"/>
+			<path class="st0" d="M45.8,71.2c-16.6-0.5-29.7-13.8-29.3-30c0.4-17.1,14-30.3,30.7-29.8C64,11.9,77.2,25.6,76.7,42.1
+				C76.1,58.7,62.3,71.7,45.8,71.2z"/>
+		</g>
+		<g>
+			<path class="st0" d="M371.2,133.3h16.6v116.2h-16.6V133.3z"/>
+			<path class="st0" d="M454,147.7h-39.8v-14.4h96.2v14.4h-39.9v101.8H454V147.7z"/>
+			<path class="st0" d="M553.7,136.6c0,3.2-0.5,5.6-2.7,11.8l-8,23.2h-10.5l6.1-24.7c-4.2-1.5-7-5.3-7-10.3
+				c0-6.6,4.8-11.3,11.1-11.3S553.7,130.1,553.7,136.6z"/>
+			<path class="st0" d="M578.2,236.2l6.1-13c8.6,7.8,23.4,13.5,38.4,13.5c20.1,0,28.7-7.8,28.7-17.9c0-28.4-70.4-10.5-70.4-53.6
+				c0-17.9,13.9-33.2,44.5-33.2c13.6,0,27.7,3.7,37.4,10.3l-5.5,13.3c-10.1-6.5-21.6-9.5-31.9-9.5c-19.8,0-28.2,8.3-28.2,18.4
+				c0,28.4,70.4,10.6,70.4,53.3c0,17.8-14.3,33-45,33C605,250.8,587.5,244.9,578.2,236.2z"/>
+			<path class="st0" d="M743.8,191.4c0-34,26.2-59.5,61.9-59.5c35.4,0,61.6,25.2,61.6,59.5c0,34.2-26.2,59.5-61.6,59.5
+				C770.1,250.8,743.8,225.4,743.8,191.4z M850.8,191.4c0-25.7-19.3-44.7-45-44.7c-26.1,0-45.3,18.9-45.3,44.7
+				c0,25.7,19.3,44.7,45.3,44.7C831.5,236.1,850.8,217.1,850.8,191.4z"/>
+			<path class="st0" d="M901.1,133.3h16.6v101.8h62.9v14.4h-79.5V133.3z"/>
+			<path class="st0" d="M1008,133.3h16.6v116.2H1008V133.3z"/>
+			<path class="st0" d="M1167.6,133.3l-51,116.2h-16.4l-51.1-116.2h17.9l41.8,95.5l42.2-95.5H1167.6z"/>
+			<path class="st0" d="M1190.7,133.3h16.6v116.2h-16.6V133.3z"/>
+			<path class="st0" d="M1324.6,220.4h-61.8l-12.8,29.1h-17.1l52.6-116.2h16.4l52.9,116.2h-17.4L1324.6,220.4z M1318.8,207.2
+				l-25.1-57l-25.1,57H1318.8z"/>
+		</g>
+	</g>
+</g>
+</svg>
+</a>
+  <ul class="nav-links">
+    <li><a href="#products">Products</a></li>
+    <li><a href="#lifestyle">Lifestyle</a></li>
+    <li><a href="#proof">Stories</a></li>
+    <li><a href="#ceo">Our Vision</a></li>
+  </ul>
+  <a href="#final-cta" class="nav-cta">Begin</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grain"></div>
+  <div class="hero-line-left"></div>
+  <div class="hero-line-right"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">It's Olivia — Est. IO</p>
+    <h1 class="hero-headline">
+      This isn't<br>
+      what you <em>use.</em><br>
+      It's who you <em>become.</em>
+    </h1>
+    <p class="hero-subheadline">
+      A collection for women who have outgrown<br>
+      ordinary — and decided to live accordingly.
+    </p>
+    <a href="#products" class="hero-cta">Discover IO</a>
+  </div>
+  <div class="hero-scroll">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-text">Presence · Ritual · Elevation · IO — It's Olivia</span>
+    <span class="marquee-text">Confidence · Clarity · Glow · IO — It's Olivia</span>
+    <span class="marquee-text">Presence · Ritual · Elevation · IO — It's Olivia</span>
+    <span class="marquee-text">Confidence · Clarity · Glow · IO — It's Olivia</span>
+    <span class="marquee-text">Presence · Ritual · Elevation · IO — It's Olivia</span>
+    <span class="marquee-text">Confidence · Clarity · Glow · IO — It's Olivia</span>
+  </div>
+</div>
+
+<!-- BELIEF SECTION -->
+<section id="belief">
+  <div class="belief-left">
+    <div class="belief-accent">IO</div>
+    <div class="belief-left-content">
+      <span class="section-tag reveal">The Philosophy</span>
+      <h2 class="belief-headline reveal reveal-delay-1">
+        There is a version of you<br>
+        that was always <em>meant</em><br>
+        to exist.
+      </h2>
+      <div class="belief-divider reveal reveal-delay-2"></div>
+      <p class="belief-text reveal reveal-delay-2">
+        She walks into a room and people notice—<br>
+        not because she announces herself,<br>
+        but because she doesn't need to.
+        <br><br>
+        She has learned the quiet art of presence.<br>
+        She has invested in her rituals.<br>
+        She protects her energy like currency.
+        <br><br>
+        IO was not created to sell you products.<br>
+        IO was created to remind you<br>
+        of everything you already are.
+      </p>
+    </div>
+  </div>
+  <div class="belief-right reveal reveal-delay-3">
+    <div class="belief-card">
+      <p class="belief-card-quote">
+        "Most women wait for permission<br>
+        to become extraordinary.<br>
+        <span>IO is for the ones who stopped waiting.</span>"
+      </p>
+      <p class="belief-card-author">— The IO Manifesto</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS SECTION -->
+<section id="products">
+  <div class="products-header">
+    <span class="section-tag reveal">The Collection</span>
+    <h2 class="products-headline reveal reveal-delay-1">
+      Objects of <em>transformation.</em><br>
+      Not decoration.
+    </h2>
+    <p class="products-sub reveal reveal-delay-2">Three rituals. One identity. Yours.</p>
+  </div>
+  <div class="products-grid">
+
+    <!-- PERFUME -->
+    <div class="product-card reveal">
+      <div class="product-number">01</div>
+      <div class="product-icon">
+        <svg viewBox="0 0 24 24"><path d="M9 3h6v2H9zM7 5h10v2H7zM5 7h14v13a2 2 0 01-2 2H7a2 2 0 01-2-2V7z"/><path d="M12 11v6M9 14h6"/></svg>
+      </div>
+      <p class="product-name">Signature Scent</p>
+      <h3 class="product-title">OLIVIA No.1<br>Eau de Parfum</h3>
+      <p class="product-tagline">The scent she leaves behind.</p>
+      <div class="product-divider"></div>
+      <p class="product-desc">
+        Warm amber and white musk open into notes of jasmine and vetiver—<br>
+        a fragrance that doesn't ask for attention.<br>
+        It simply commands memory.
+      </p>
+      <p class="product-transformation">
+        Wear it and something shifts.<br>
+        Strangers lean in.<br>
+        Rooms feel different when you enter.<br>
+        You feel like yourself—<br>
+        only more.
+      </p>
+      <a href="#signature" class="product-link">
+        Experience it
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+
+    <!-- COLLAGEN -->
+    <div class="product-card reveal reveal-delay-1">
+      <div class="product-number">02</div>
+      <div class="product-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 3"/><path d="M8 3.5C9.2 3 10.5 2.5 12 2.5s2.8.5 4 1"/></svg>
+      </div>
+      <p class="product-name">Inner Glow</p>
+      <h3 class="product-title">Collagen Fiber<br>Detox</h3>
+      <p class="product-tagline">Beauty from the inside out.</p>
+      <div class="product-divider"></div>
+      <p class="product-desc">
+        A daily ritual of renewal.<br>
+        Collagen-rich, fiber-infused—<br>
+        formulated to cleanse what you can't see<br>
+        and illuminate what you always could.
+      </p>
+      <p class="product-transformation">
+        You wake up lighter.<br>
+        Your skin holds a softness you forgot.<br>
+        Your body moves with ease.<br>
+        This is what reset feels like.
+      </p>
+      <a href="#signature" class="product-link">
+        Begin the ritual
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+
+    <!-- COFFEE -->
+    <div class="product-card reveal reveal-delay-2">
+      <div class="product-number">03</div>
+      <div class="product-icon">
+        <svg viewBox="0 0 24 24"><path d="M17 8h1a4 4 0 010 8h-1"/><path d="M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>
+      </div>
+      <p class="product-name">Morning Ritual</p>
+      <h3 class="product-title">IO Coffee<br>Black & Latte</h3>
+      <p class="product-tagline">A ritual, not a routine.</p>
+      <div class="product-divider"></div>
+      <p class="product-desc">
+        Two blends. One intention.<br>
+        The IO Black for those who need clarity without compromise.<br>
+        The IO Latte for mornings that deserve warmth.
+      </p>
+      <p class="product-transformation">
+        The first sip sets your intention.<br>
+        The ritual becomes the day.<br>
+        And the day becomes proof<br>
+        of what you're building.
+      </p>
+      <a href="#signature" class="product-link">
+        Start your morning
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- SIGNATURE HIGHLIGHTS -->
+<section id="signature">
+
+  <!-- PERFUME BLOCK -->
+  <div class="sig-block">
+    <div class="sig-visual">
+      <div class="sig-visual-bg perfume">
+        <div class="sig-letter">P</div>
+        <div class="sig-visual-icon">
+          <div class="sig-visual-inner">
+            <svg viewBox="0 0 24 24" style="stroke: var(--gold); fill: none;">
+              <path d="M9 3h6v2H9zM7 5h10v2H7zM5 7h14v13a2 2 0 01-2 2H7a2 2 0 01-2-2V7z"/>
+              <path d="M12 12v4M10 14h4"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sig-copy on-dark">
+      <span class="section-tag reveal">OLIVIA No.1</span>
+      <h2 class="sig-headline reveal reveal-delay-1">
+        She doesn't just<br>
+        enter the room.<br>
+        She <em>stays</em> in it.
+      </h2>
+      <p class="sig-body reveal reveal-delay-2">
+        Long after she leaves, something lingers—<br>
+        warm, quiet, unmistakable.<br>
+        <br>
+        OLIVIA No.1 is not a fragrance you wear.<br>
+        It's a presence you cultivate.<br>
+        A signature no one else can copy.
+      </p>
+      <div class="sig-attribute reveal reveal-delay-3">
+        <div class="sig-attr-row"><div class="sig-attr-dot"></div>Warm Amber · White Musk · Vetiver</div>
+        <div class="sig-attr-row"><div class="sig-attr-dot"></div>Long-lasting, 12-hour projection</div>
+        <div class="sig-attr-row"><div class="sig-attr-dot"></div>Handcrafted for high-value women</div>
+      </div>
+      <a href="#final-cta" class="sig-btn reveal reveal-delay-4">Own Your Presence</a>
+    </div>
+  </div>
+
+  <!-- COLLAGEN BLOCK -->
+  <div class="sig-block">
+    <div class="sig-visual">
+      <div class="sig-visual-bg collagen">
+        <div class="sig-letter dark">G</div>
+        <div class="sig-visual-icon">
+          <div class="sig-visual-inner" style="border-color: rgba(27,27,27,0.2);">
+            <svg viewBox="0 0 24 24" style="stroke: var(--black); fill: none; opacity: 0.6;">
+              <circle cx="12" cy="12" r="8"/>
+              <path d="M8 12 Q12 8 16 12 Q12 16 8 12"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sig-copy on-light">
+      <span class="section-tag reveal">Collagen Fiber Detox</span>
+      <h2 class="sig-headline reveal reveal-delay-1">
+        Glow isn't<br>
+        applied.<br>
+        It's <em>released.</em>
+      </h2>
+      <p class="sig-body reveal reveal-delay-2">
+        Your skin has always known how to be radiant.<br>
+        Your gut has always known how to be clean.<br>
+        <br>
+        IO Collagen Fiber Detox removes what's been<br>
+        dimming your light—from the inside.<br>
+        What's left is unmistakably, unapologetically you.
+      </p>
+      <div class="sig-attribute reveal reveal-delay-3">
+        <div class="sig-attr-row" style="color: rgba(27,27,27,0.5)"><div class="sig-attr-dot"></div>Marine Collagen · Prebiotic Fiber · Antioxidants</div>
+        <div class="sig-attr-row" style="color: rgba(27,27,27,0.5)"><div class="sig-attr-dot"></div>Supports gut clarity and skin luminosity</div>
+        <div class="sig-attr-row" style="color: rgba(27,27,27,0.5)"><div class="sig-attr-dot"></div>Daily reset. Lasting results.</div>
+      </div>
+      <a href="#final-cta" class="sig-btn reveal reveal-delay-4">Begin Your Reset</a>
+    </div>
+  </div>
+
+  <!-- COFFEE BLOCK -->
+  <div class="sig-block">
+    <div class="sig-visual">
+      <div class="sig-visual-bg coffee">
+        <div class="sig-letter">C</div>
+        <div class="sig-visual-icon">
+          <div class="sig-visual-inner">
+            <svg viewBox="0 0 24 24" style="stroke: var(--gold); fill: none;">
+              <path d="M17 8h1a4 4 0 010 8h-1"/><path d="M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8z"/>
+              <line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sig-copy on-coffee">
+      <span class="section-tag reveal">IO Coffee</span>
+      <h2 class="sig-headline reveal reveal-delay-1">
+        The morning<br>
+        belongs to<br>
+        those who <em>claim it.</em>
+      </h2>
+      <p class="sig-body reveal reveal-delay-2">
+        Not every morning deserves a ritual.<br>
+        Yours does.<br>
+        <br>
+        IO Coffee is the cup that sets the tone—<br>
+        not just for productivity, but for identity.<br>
+        You are someone who begins with intention.
+      </p>
+      <div class="sig-attribute reveal reveal-delay-3">
+        <div class="sig-attr-row"><div class="sig-attr-dot"></div>Single-origin, slow-roasted beans</div>
+        <div class="sig-attr-row"><div class="sig-attr-dot"></div>IO Black — pure, bold, uncompromising</div>
+        <div class="sig-attr-row"><div class="sig-attr-dot"></div>IO Latte — smooth, warm, ceremonial</div>
+      </div>
+      <a href="#final-cta" class="sig-btn reveal reveal-delay-4">Begin Your Morning</a>
+    </div>
+  </div>
+
+</section>
+
+<!-- SOCIAL PROOF -->
+<section id="proof">
+  <div class="proof-header">
+    <span class="section-tag reveal">What They Say</span>
+    <h2 class="proof-headline reveal reveal-delay-1">
+      She changed her ritual.<br>
+      <em>She changed her life.</em>
+    </h2>
+  </div>
+  <div class="proof-grid">
+    <div class="proof-card reveal">
+      <div class="proof-stars">
+        <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+      <p class="proof-quote">
+        "I wore OLIVIA No.1 to a meeting and a client said,
+        <span>'I don't know what it is about you today — you seem different.'</span>
+        I smiled and said nothing. That's the point."
+      </p>
+      <div class="proof-author">
+        <div class="proof-avatar">A</div>
+        <div>
+          <p class="proof-name">Andrea M.</p>
+          <p class="proof-title">Executive, Manila</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="proof-card reveal reveal-delay-1">
+      <div class="proof-stars">
+        <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+      <p class="proof-quote">
+        "Two weeks on the Collagen Detox. My skin is different.
+        My digestion is different. I feel like I finally cleaned out
+        <span>everything that was weighing me down.</span>
+        I look like myself again."
+      </p>
+      <div class="proof-author">
+        <div class="proof-avatar">S</div>
+        <div>
+          <p class="proof-name">Sophia R.</p>
+          <p class="proof-title">Entrepreneur, Cebu</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="proof-card reveal reveal-delay-2">
+      <div class="proof-stars">
+        <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+      <p class="proof-quote">
+        "My morning IO Coffee ritual is sacred now.
+        It's not about caffeine — it's about the ten minutes I take
+        for myself before the world wants a piece of me.
+        <span>IO gave me back my mornings.</span>"
+      </p>
+      <div class="proof-author">
+        <div class="proof-avatar">C</div>
+        <div>
+          <p class="proof-name">Carla V.</p>
+          <p class="proof-title">Creative Director, BGC</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIFESTYLE EXPANSION -->
+<section id="lifestyle">
+  <div class="lifestyle-bg-text">IO</div>
+  <div class="lifestyle-content">
+    <span class="section-tag reveal">Beyond the Collection</span>
+    <h2 class="lifestyle-headline reveal reveal-delay-1">
+      Some women<br>
+      use IO.<br>
+      Others <em>build</em><br>
+      with it.
+    </h2>
+    <p class="lifestyle-body reveal reveal-delay-2">
+      IO was born from a simple belief: that a woman who invests in herself
+      naturally inspires others to do the same. What begins as a personal ritual
+      becomes a circle of women who are rising together—sharing what works,
+      building something real, and living proof that elevation is contagious.
+    </p>
+    <div class="lifestyle-pillars reveal reveal-delay-3">
+      <div class="pillar">
+        <p class="pillar-num">01</p>
+        <p class="pillar-title">Live It</p>
+        <p class="pillar-text">Adopt the rituals. Feel the shift. Let the transformation become your daily standard.</p>
+      </div>
+      <div class="pillar">
+        <p class="pillar-num">02</p>
+        <p class="pillar-title">Share It</p>
+        <p class="pillar-text">When something changes you, you tell people. That's not selling. That's influence.</p>
+      </div>
+      <div class="pillar">
+        <p class="pillar-num">03</p>
+        <p class="pillar-title">Build It</p>
+        <p class="pillar-text">IO offers a path for women who want their passion for the brand to create real income.</p>
+      </div>
+    </div>
+    <div class="lifestyle-note reveal reveal-delay-4">
+      <p class="lifestyle-note-text">
+        "The best businesses are built by women<br>
+        who simply couldn't stop talking about<br>
+        <span>what changed their life."</span>
+      </p>
+    </div>
+  </div>
+  <img class="lifestyle-woman" src="woman use IO.png">
+</section>
+
+<!-- CEO SECTION -->
+<section id="ceo">
+  <div class="ceo-left">
+    <p class="ceo-eyebrow reveal">A Message from the Founder</p>
+    <h2 class="ceo-headline reveal reveal-delay-1">
+      I didn't build IO<br>
+      to sell products.<br>
+      I built it to <em>prove<br>
+      something.</em>
+    </h2>
+    <div class="ceo-manifesto reveal reveal-delay-2">
+      <p class="ceo-line">That a woman who feels extraordinary performs extraordinarily.</p>
+      <p class="ceo-line">That beauty rituals are not vanity—they are strategy.</p>
+      <p class="ceo-line">That the version of you who wears her confidence like a second skin is not a fantasy. She is closer than you think.</p>
+      <p class="ceo-line">You don't just consume IO. You become part of something bigger. A circle of women who have chosen themselves — on purpose, every day.</p>
+    </div>
+    <p class="ceo-sig reveal reveal-delay-3">Olivia</p>
+    <p class="ceo-sig-title reveal reveal-delay-3">Founder & CEO, IO — It's Olivia</p>
+  </div>
+  <div class="ceo-right reveal reveal-delay-2">
+    <div class="ceo-card">
+      <p class="ceo-philosophy">
+        We believe that <em>who you are</em> matters more than what you own.
+        <span>IO is the collection that bridges the two.</span>
+      </p>
+      <div class="ceo-values">
+        <div class="ceo-value">
+          <div class="ceo-value-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <p class="ceo-value-text">Luxury should feel like you — not like a label you're borrowing.</p>
+        </div>
+        <div class="ceo-value">
+          <div class="ceo-value-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <p class="ceo-value-text">Self-care is not indulgence. It is the most strategic investment you will ever make.</p>
+        </div>
+        <div class="ceo-value">
+          <div class="ceo-value-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <p class="ceo-value-text">The women who elevate others elevate everything. That is the IO vision.</p>
+        </div>
+        <div class="ceo-value">
+          <div class="ceo-value-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <p class="ceo-value-text">Your story is not over. In fact — this is exactly where it gets good.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section id="final-cta">
+  <div class="final-cta-bg"></div>
+  <div class="final-cta-content">
+    <div class="final-cta-line reveal"></div>
+    <p class="final-cta-tag reveal reveal-delay-1">The Invitation</p>
+    <h2 class="final-cta-headline reveal reveal-delay-2">
+      Step into the version<br>
+      of you that<br>
+      <em>already exists.</em>
+    </h2>
+    <p class="final-cta-sub reveal reveal-delay-3">
+      She is not waiting for the right time.<br>
+      She is not waiting for permission.<br>
+      She is waiting for you to choose her.
+    </p>
+    <div class="final-cta-buttons reveal reveal-delay-4">
+      <a href="#products" class="btn-primary">Shop the Collection</a>
+      <a href="#lifestyle" class="btn-secondary">Explore the IO Life</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <p class="footer-logo"><svg width="200px" height="auto" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1369.9 318" style="enable-background:new 0 0 1369.9 318;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#C0B387;}
+</style>
+<g>
+	<g>
+		<g>
+			<path class="st0" d="M201.5,308.8c-63.3-0.5-113.1-52.9-112.4-118.3c0.7-63.2,51.6-113.4,114.3-112.7
+				c63.8,0.7,113.4,51.3,112.9,115.1C315.7,257.4,264.3,309.3,201.5,308.8z M269,239.4c0.3-10.6-1.2-21.4-3.4-32.2
+				c-7-33.9-20.3-64.9-42.2-91.8c-8.6-10.5-18-20.3-30.6-26.2c-20.4-9.6-39.1-3.2-49.6,16.7c-5.7,10.8-8,22.5-8,34.4
+				c-0.2,53.5,19.1,99.6,53.9,139.6c6.5,7.5,14.4,13.5,23.5,17.8c19.8,9.4,39.2,2.6,48.7-17.2C267.5,267.6,269.2,253.9,269,239.4z"></path>
+			<path class="st0" d="M91.8,303.9c-23.4,0-46.8,0-70.2,0c-4.4,0-3.3-2.9-3.3-5.2c0-38.1,0-76.2-0.2-114.3c0-14.8,2.2-29.2,7-43.1
+				C33,118.5,46,99.5,66.3,86.1c1.5-1,2.8-2.4,5.6-2.5c0,11.9,0,23.7,0,35.5c-0.1,48.9-0.1,97.8-0.2,146.7c0,10.4,2,19.9,8.9,28.1
+				C83.8,297.6,87.6,300.6,91.8,303.9z"></path>
+			<path class="st0" d="M45.8,71.2c-16.6-0.5-29.7-13.8-29.3-30c0.4-17.1,14-30.3,30.7-29.8C64,11.9,77.2,25.6,76.7,42.1
+				C76.1,58.7,62.3,71.7,45.8,71.2z"></path>
+		</g>
+		<g>
+			<path class="st0" d="M371.2,133.3h16.6v116.2h-16.6V133.3z"></path>
+			<path class="st0" d="M454,147.7h-39.8v-14.4h96.2v14.4h-39.9v101.8H454V147.7z"></path>
+			<path class="st0" d="M553.7,136.6c0,3.2-0.5,5.6-2.7,11.8l-8,23.2h-10.5l6.1-24.7c-4.2-1.5-7-5.3-7-10.3
+				c0-6.6,4.8-11.3,11.1-11.3S553.7,130.1,553.7,136.6z"></path>
+			<path class="st0" d="M578.2,236.2l6.1-13c8.6,7.8,23.4,13.5,38.4,13.5c20.1,0,28.7-7.8,28.7-17.9c0-28.4-70.4-10.5-70.4-53.6
+				c0-17.9,13.9-33.2,44.5-33.2c13.6,0,27.7,3.7,37.4,10.3l-5.5,13.3c-10.1-6.5-21.6-9.5-31.9-9.5c-19.8,0-28.2,8.3-28.2,18.4
+				c0,28.4,70.4,10.6,70.4,53.3c0,17.8-14.3,33-45,33C605,250.8,587.5,244.9,578.2,236.2z"></path>
+			<path class="st0" d="M743.8,191.4c0-34,26.2-59.5,61.9-59.5c35.4,0,61.6,25.2,61.6,59.5c0,34.2-26.2,59.5-61.6,59.5
+				C770.1,250.8,743.8,225.4,743.8,191.4z M850.8,191.4c0-25.7-19.3-44.7-45-44.7c-26.1,0-45.3,18.9-45.3,44.7
+				c0,25.7,19.3,44.7,45.3,44.7C831.5,236.1,850.8,217.1,850.8,191.4z"></path>
+			<path class="st0" d="M901.1,133.3h16.6v101.8h62.9v14.4h-79.5V133.3z"></path>
+			<path class="st0" d="M1008,133.3h16.6v116.2H1008V133.3z"></path>
+			<path class="st0" d="M1167.6,133.3l-51,116.2h-16.4l-51.1-116.2h17.9l41.8,95.5l42.2-95.5H1167.6z"></path>
+			<path class="st0" d="M1190.7,133.3h16.6v116.2h-16.6V133.3z"></path>
+			<path class="st0" d="M1324.6,220.4h-61.8l-12.8,29.1h-17.1l52.6-116.2h16.4l52.9,116.2h-17.4L1324.6,220.4z M1318.8,207.2
+				l-25.1-57l-25.1,57H1318.8z"></path>
+		</g>
+	</g>
+</g>
+</svg></p>
+      <p class="footer-tagline">A movement disguised as a brand. For women who have chosen to become extraordinary.</p>
+    </div>
+    <div>
+      <p class="footer-col-title">Collection</p>
+      <div class="footer-links">
+        <a href="#">OLIVIA No.1 Perfume</a>
+        <a href="#">Collagen Fiber Detox</a>
+        <a href="#">IO Coffee Black</a>
+        <a href="#">IO Coffee Latte</a>
+      </div>
+    </div>
+    <div>
+      <p class="footer-col-title">IO Life</p>
+      <div class="footer-links">
+        <a href="#">Our Philosophy</a>
+        <a href="#">Partner with IO</a>
+        <a href="#">The IO Circle</a>
+        <a href="#">Stories</a>
+      </div>
+    </div>
+    <div>
+      <p class="footer-col-title">Connect</p>
+      <div class="footer-links">
+        <a href="#">Instagram</a>
+        <a href="#">TikTok</a>
+        <a href="#">Facebook</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2025 IO — It's Olivia. All rights reserved.</p>
+    <p class="footer-io"><svg width="32px" height="auto" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 1000 1000" style="enable-background:new 0 0 1000 1000;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#C0B387;}
+</style>
+<g>
+	<g>
+		<path class="st0" d="M611.4,972c-201.1-1.6-359.1-168.1-356.8-375.6c2.2-200.5,163.8-359.9,362.7-357.8
+			c202.4,2.1,359.9,162.7,358.3,365.5C974,808.8,810.9,973.6,611.4,972z M825.9,751.7c0.9-33.5-3.7-68-10.6-102.2
+			C793.2,541.9,750.9,443.4,681.2,358C654,324.6,624,293.6,584,274.7c-64.9-30.4-124.1-10.3-157.3,53
+			c-18.1,34.3-25.3,71.4-25.4,109.3c-0.5,169.8,60.6,316.2,171.1,443.2c20.7,23.7,45.8,42.8,74.6,56.6c63,29.9,124.4,8.2,154.6-54.6
+			C821.2,841.4,826.3,797.9,825.9,751.7z"/>
+		<path class="st0" d="M263.3,956.6c-74.3,0-148.6-0.1-223,0.1c-13.8,0-10.5-9.2-10.5-16.6c-0.1-120.9,0-241.8-0.5-362.7
+			c-0.1-46.9,7-92.7,22.2-136.9c24.9-72.4,66.4-132.6,130.9-175.4c4.6-3.1,8.8-7.6,17.7-8.1c0,37.8,0,75.3,0,112.7
+			c-0.2,155.2-0.2,310.4-0.7,465.6c-0.1,33,6.4,63.3,28.2,89.2C238,936.4,250,946,263.3,956.6z"/>
+		<path class="st0" d="M117.4,218c-52.8-1.5-94.1-43.9-92.9-95.3c1.2-54.4,44.4-96.1,97.5-94.6c53.1,1.6,94.9,45.1,93.3,97.3
+			C213.5,178.2,169.8,219.5,117.4,218z"/>
+	</g>
+</g>
+</svg></p>
+  </div>
+</footer>
+
+<script>
+  // CURSOR
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animCursor() {
+    cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(animCursor);
+  }
+  animCursor();
+  document.querySelectorAll('a, button, .product-card').forEach(el => {
+    el.addEventListener('mouseenter', () => ring.classList.add('hover'));
+    el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
+  });
+
+  // NAV SCROLL
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // REVEAL ON SCROLL
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
